@@ -10,7 +10,7 @@ class Board
     [0,4,8],
     [6,4,2] ]
 
-  attr_accessor :cells, :choice
+  attr_accessor :cells
 
   def initialize(cells = [" ", " ", " ", " ", " ", " ", " ", " ", " "])
     @cells = cells
@@ -21,15 +21,29 @@ class Board
   end
 
   def display
-    puts " #{cells[0]} | #{cells[1]} | #{cells[2]} "
+    puts " #{cell_display(0)} | #{cell_display(1)} | #{cell_display(2)} "
     puts "-----------"
-    puts " #{cells[3]} | #{cells[4]} | #{cells[5]} "
+    puts " #{cell_display(3)} | #{cell_display(4)} | #{cell_display(5)} "
     puts "-----------"
-    puts " #{cells[6]} | #{cells[7]} | #{cells[8]} "
+    puts " #{cell_display(6)} | #{cell_display(7)} | #{cell_display(8)} "
   end
 
-  def position(player_input)
-    cells[player_input.to_i - 1]
+  def cell_display(cell)
+    if cells[cell] == ' '
+      "#{cell + 1}".colorize(:light_black)
+    elsif cells[cell] == "X"
+      "X".colorize(:light_green)
+    elsif cells[cell] == "O"
+      "O".colorize(:light_red)
+    end
+  end
+
+  def position(input)
+    cells[input.to_i - 1]  
+  end
+
+  def converter(player_input)
+      player_input.to_i - 1
   end
 
   def full?
@@ -41,66 +55,20 @@ class Board
   end
 
   def taken?(player_input)
-    cells[player_input.to_i - 1] != " "
+    # cells[converter(player_input)] != " "
+    !(position(player_input) == " ")
   end
 
   def valid_move?(player_input)
     player_input.to_i >= 1 && player_input.to_i <= 9 && !taken?(player_input)
   end
-# don't get why this didn't work.
-  # def update(player_input, player)
-  #   binding.pry
-  #   self.position(player_input) == player.token
-  # end
 
   def update(input, player)
-  	cells[input.to_i - 1] = player.token
+  	cells[converter(input)] = player.token
   end
 
   def move(input, token)
     cells[input] = token
-  end
-
-  def won?
-
-    WIN_COMBINATIONS.each do |win_combination|
-      #cycles through WIN_COMBINATIONS i.e. [0,1,2], then [3,4,5], then [6,7,8]
-      win_index_1 = win_combination[0]
-      win_index_2 = win_combination[1]
-      win_index_3 = win_combination[2]
-
-      #then gets values at each of these cells
-      position_1 = cells[win_index_1] #could be "X", "O", or " "
-      position_2 = cells[win_index_2] #could be "X", "O", or " "
-      position_3 = cells[win_index_3] #could be "X", "O", or " "
-
-      if position_1 == position_2 && position_2 == position_3 && position_1 != " "
-        return win_combination
-      end
-    end
-    false
-  end
-
-# more elegant solution
-  # def won?
-  #   winning_array = Game::WIN_COMBINATIONS::WIN_COMBINATIONS
-  #   winning_array.detect do |combo|
-  #     board.cells[combo[0]] == board.cells[combo[1]] &&
-  #     board.cells[combo[1]] == board.cells[combo[2]] &&
-  #     board.taken?(combo[0] + 1)
-  #   end
-  # end
-
-  def draw?
-    full? && !won?
-  end
-
-  def over?
-    won? || draw?
-  end
-
-  def winner
-    won? ? cells[won?.first] : nil
   end
 
   def clone

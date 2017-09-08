@@ -1,3 +1,4 @@
+require 'colorize'
 require 'bundler'
 Bundler.require
 
